@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 95" width="300" height="95">
+  <defs>
+    <linearGradient id="bcaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#003d79"/>
+      <stop offset="100%" stop-color="#0060af"/>
+    </linearGradient>
+  </defs>
+  <!-- Background Badge -->
+  <rect width="300" height="95" rx="14" fill="#003d79"/>
+  
+  <!-- Emblem Symbol -->
+  <g transform="translate(18, 14)">
+    <!-- Outer shield / emblem -->
+    <path d="M33 3 C16 3 3 16 3 33 C3 50 16 63 33 63 C50 63 63 50 63 33 C63 16 50 3 33 3 Z" fill="#ffffff" opacity="0.12"/>
+    <!-- Central diamond / floral motif of BCA -->
+    <path d="M33 7 L45 23 L61 33 L45 43 L33 59 L21 43 L5 33 L21 23 Z" fill="#ffffff"/>
+    <path d="M33 16 L40 28 L52 33 L40 38 L33 50 L26 38 L14 33 L26 28 Z" fill="#003d79"/>
+    <circle cx="33" cy="33" r="5" fill="#ffffff"/>
+  </g>
+
+  <!-- Typography: BCA -->
+  <g fill="#ffffff" transform="translate(95, 18)">
+    <!-- Letter B -->
+    <path d="M0 4 H26 C36 4 43 9 43 17 C43 23 39 27 34 29 C41 31 46 36 46 45 C46 54 38 60 26 60 H0 V4 Z M13 14 V26 H24 C28 26 31 24 31 20 C31 16 28 14 24 14 H13 Z M13 36 V50 H26 C31 50 34 47 34 43 C34 39 31 36 26 36 H13 Z"/>
+    
+    <!-- Letter C -->
+    <path d="M96 22 C91 14 82 9 71 9 C53 9 41 23 41 37 C41 51 53 65 71 65 C82 65 91 60 96 52 L86 45 C83 50 78 54 71 54 C60 54 53 46 53 37 C53 28 60 20 71 20 C78 20 83 24 86 29 L96 22 Z"/>
+    
+    <!-- Letter A -->
+    <path d="M125 4 L145 60 H132 L128 47 H111 L107 60 H95 L115 4 H125 Z M124 36 L119 20 L114 36 H124 Z"/>
+  </g>
+
+  <!-- Subtitle: BANK CENTRAL ASIA -->
+  <text x="96" y="81" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif" font-size="9" font-weight="700" fill="#a8c7ea" letter-spacing="2.5">BANK CENTRAL ASIA</text>
+</svg>
