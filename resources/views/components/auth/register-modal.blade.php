@@ -16,41 +16,47 @@
             @csrf
             <div>
                 <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">Nama Lengkap</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none">
-                        <i class="fas fa-user text-xs"></i>
+                <div class="relative flex items-center">
+                    <input type="text" name="name" placeholder="Nama Lengkap Anda" class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" required />
+                    <span class="absolute left-3.5 flex items-center pointer-events-none text-gray-400 z-10">
+                        <i class="fas fa-user text-sm"></i>
                     </span>
-                    <input type="text" name="name" placeholder="Nama Lengkap Anda" class="input input-bordered w-full pl-9 rounded-xl text-sm focus:input-primary" required />
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">Alamat Email</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none">
-                        <i class="fas fa-envelope text-xs"></i>
+                <div class="relative flex items-center">
+                    <input type="email" name="email" placeholder="nama@email.com" class="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" required />
+                    <span class="absolute left-3.5 flex items-center pointer-events-none text-gray-400 z-10">
+                        <i class="fas fa-envelope text-sm"></i>
                     </span>
-                    <input type="email" name="email" placeholder="nama@email.com" class="input input-bordered w-full pl-9 rounded-xl text-sm focus:input-primary" required />
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none">
-                        <i class="fas fa-lock text-xs"></i>
+                <div class="relative flex items-center">
+                    <input type="password" id="registerPassword" name="password" placeholder="Minimal 8 karakter" class="w-full pl-10 pr-11 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" required />
+                    <span class="absolute left-3.5 flex items-center pointer-events-none text-gray-400 z-10">
+                        <i class="fas fa-lock text-sm"></i>
                     </span>
-                    <input type="password" name="password" placeholder="Minimal 8 karakter" class="input input-bordered w-full pl-9 rounded-xl text-sm focus:input-primary" required />
+                    <button type="button" onclick="togglePasswordVisibility('registerPassword', this)" class="absolute right-3.5 flex items-center text-gray-400 hover:text-gray-600 transition cursor-pointer z-10" title="Tampilkan / Sembunyikan Password">
+                        <i class="fas fa-eye text-sm"></i>
+                    </button>
                 </div>
             </div>
 
             <div>
                 <label class="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1.5">Konfirmasi Password</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-gray-400 pointer-events-none">
-                        <i class="fas fa-shield-alt text-xs"></i>
+                <div class="relative flex items-center">
+                    <input type="password" id="registerConfirmPassword" name="password_confirmation" placeholder="Ulangi password" class="w-full pl-10 pr-11 py-2.5 bg-white border border-gray-200 rounded-xl text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition" required />
+                    <span class="absolute left-3.5 flex items-center pointer-events-none text-gray-400 z-10">
+                        <i class="fas fa-shield-alt text-sm"></i>
                     </span>
-                    <input type="password" name="password_confirmation" placeholder="Ulangi password" class="input input-bordered w-full pl-9 rounded-xl text-sm focus:input-primary" required />
+                    <button type="button" onclick="togglePasswordVisibility('registerConfirmPassword', this)" class="absolute right-3.5 flex items-center text-gray-400 hover:text-gray-600 transition cursor-pointer z-10" title="Tampilkan / Sembunyikan Password">
+                        <i class="fas fa-eye text-sm"></i>
+                    </button>
                 </div>
             </div>
 
