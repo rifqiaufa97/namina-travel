@@ -25,5 +25,7 @@ jobs:
           script_stop: true
           script: |
             cd /home/naminatr/namina-travel
+            git fetch origin master
+            git reset --hard origin/master
             chmod +x deploy.sh
             bash ./deploy.sh
