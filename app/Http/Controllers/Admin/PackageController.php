@@ -33,9 +33,16 @@ class PackageController extends BaseController
             'location' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
-            'image' => 'required|image|max:2048',
-            'images.*' => 'image|max:2048',
+            'image' => 'required|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'is_featured' => 'boolean',
+        ], [
+            'image.required' => 'Foto sampul utama wajib diunggah.',
+            'image.image' => 'File foto sampul harus berupa gambar valid.',
+            'image.max' => 'Ukuran foto sampul utama maksimal 10MB.',
+            'images.*.image' => 'File foto galeri harus berupa gambar valid.',
+            'images.*.max' => 'Setiap foto galeri maksimal berukuran 10MB.',
         ]);
 
         $imagePath = $request->file('image')->store('destinations', 'public');
@@ -109,9 +116,15 @@ class PackageController extends BaseController
             'location' => 'required|string|max:255',
             'city' => 'required|string|max:100',
             'province' => 'required|string|max:100',
-            'image' => 'nullable|image|max:2048',
-            'images.*' => 'image|max:2048',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:10240',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,webp,gif|max:10240',
             'is_featured' => 'boolean',
+        ], [
+            'image.image' => 'File foto sampul harus berupa gambar valid.',
+            'image.max' => 'Ukuran foto sampul utama maksimal 10MB.',
+            'images.*.image' => 'File foto galeri harus berupa gambar valid.',
+            'images.*.max' => 'Setiap foto galeri maksimal berukuran 10MB.',
         ]);
 
         $data = [];
@@ -145,8 +158,8 @@ class PackageController extends BaseController
         ]);
 
         if ($request->hasFile('image')) {
-            // Delete old image (optional: only from Destination, not from images table)
-            if ($package->image) {
+            // Delete old image
+            if ($package->image && Storage::disk('public')->exists($package->image)) {
                 Storage::disk('public')->delete($package->image);
             }
             $data['image'] = $request->file('image')->store('destinations', 'public');
@@ -165,14 +178,17 @@ class PackageController extends BaseController
 
         // Simpan gambar galeri tambahan
         if ($request->hasFile('images')) {
-            $order = $package->images()->max('order') + 1;
+            $maxOrder = $package->images()->max('order');
+            $order = ($maxOrder !== null ? (int)$maxOrder : 0) + 1;
             foreach ($request->file('images') as $img) {
-                $imgPath = $img->store('destinations', 'public');
-                $package->images()->create([
-                    'path' => $imgPath,
-                    'is_primary' => false,
-                    'order' => $order++,
-                ]);
+                if ($img && $img->isValid()) {
+                    $imgPath = $img->store('destinations', 'public');
+                    $package->images()->create([
+                        'path' => $imgPath,
+                        'is_primary' => false,
+                        'order' => $order++,
+                    ]);
+                }
             }
         }
 
@@ -185,7 +201,7 @@ class PackageController extends BaseController
 
     public function destroy(Destination $package)
     {
-        if ($package->image) {
+        if ($package->image && Storage::disk('public')->exists($package->image)) {
             Storage::disk('public')->delete($package->image);
         }
         $package->delete();
@@ -194,16 +210,27 @@ class PackageController extends BaseController
             ->with('success', 'Paket wisata berhasil dihapus');
     }
 
-    public function deleteImage(Destination $package, $imageId)
+    public function deleteImage(Destination $package, $image)
     {
         if (!auth()->check() || !auth()->user()->isAdmin()) {
-            abort(403, 'Aksi ini hanya dapat dilakukan oleh Admin.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Aksi ini hanya dapat dilakukan oleh Admin.'
+            ], 403);
         }
         
-        $image = $package->images()->where('id', $imageId)->firstOrFail();
+        $imageId = is_object($image) ? $image->id : $image;
+        $imageModel = $package->images()->where('id', $imageId)->first();
+        
+        if (!$imageModel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Foto galeri tidak ditemukan.'
+            ], 404);
+        }
         
         // Jangan hapus primary image lewat sini
-        if ($image->is_primary) {
+        if ($imageModel->is_primary) {
             return response()->json([
                 'success' => false,
                 'message' => 'Tidak bisa menghapus gambar utama dari galeri.'
@@ -211,13 +238,13 @@ class PackageController extends BaseController
         }
         
         try {
-            // Hapus file dari storage
-            if (Storage::disk('public')->exists($image->path)) {
-                Storage::disk('public')->delete($image->path);
+            // Hapus file dari storage jika ada
+            if ($imageModel->path && Storage::disk('public')->exists($imageModel->path)) {
+                Storage::disk('public')->delete($imageModel->path);
             }
             
             // Hapus record dari database
-            $image->delete();
+            $imageModel->delete();
             
             return response()->json([
                 'success' => true,

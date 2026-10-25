@@ -185,22 +185,55 @@
                     Foto & Dokumentasi
                 </h3>
 
+                <!-- Cover Image -->
                 <div>
-                    <label for="image" class="block text-xs font-bold text-gray-700 mb-1.5">
-                        Foto Sampul Utama <span class="text-rose-500">*</span>
+                    <label for="image" class="block text-xs font-bold text-gray-700 mb-1.5 flex items-center justify-between">
+                        <span>Foto Sampul Utama <span class="text-rose-500">*</span></span>
+                        <span class="text-[11px] font-normal text-gray-400">Maks. 10MB (JPG, PNG, WEBP)</span>
                     </label>
-                    <input type="file" id="image" name="image" accept="image/*" required
-                           class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-200 rounded-xl p-1.5 focus:outline-none">
-                    <p class="text-[11px] text-gray-400 mt-1">Disarankan rasio landscape 16:9 (Maks. 2MB).</p>
+                    <div class="mb-3 rounded-xl overflow-hidden border border-gray-200 relative group aspect-video bg-gray-100 flex items-center justify-center hidden" id="coverPreviewContainer">
+                        <img id="coverPreview" src="" alt="Preview Sampul" class="w-full h-full object-cover">
+                    </div>
+                    <input type="file" id="image" name="image" accept="image/jpeg,image/png,image/jpg,image/webp,image/gif" required
+                           class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 border border-gray-200 rounded-xl p-1.5 focus:outline-none cursor-pointer">
+                    <p class="text-[11px] text-gray-400 mt-1">Disarankan rasio landscape 16:9 (Maks. 10MB).</p>
                 </div>
 
-                <div class="pt-3 border-t border-gray-100">
-                    <label for="gallery" class="block text-xs font-bold text-gray-700 mb-1.5">
-                        Galeri Foto Tambahan
-                    </label>
-                    <input type="file" id="gallery" name="images[]" accept="image/*" multiple
-                           class="w-full text-xs text-gray-500 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 border border-gray-200 rounded-xl p-1.5 focus:outline-none">
-                    <p class="text-[11px] text-gray-400 mt-1">Dapat memilih lebih dari satu foto sekaligus.</p>
+                <!-- Gallery Upload -->
+                <div class="pt-4 border-t border-gray-100 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold text-gray-700">
+                            Galeri Foto Tambahan
+                        </label>
+                        <span class="text-[11px] text-blue-600 font-semibold bg-blue-50 px-2 py-0.5 rounded-md">
+                            Bisa pilih banyak foto
+                        </span>
+                    </div>
+
+                    <div class="border-2 border-dashed border-gray-200 hover:border-blue-400 rounded-xl p-4 text-center bg-gray-50/50 hover:bg-blue-50/20 transition cursor-pointer group"
+                         onclick="document.getElementById('galleryInput').click()">
+                        <input type="file" id="galleryInput" name="images[]" accept="image/jpeg,image/png,image/jpg,image/webp,image/gif" multiple class="hidden">
+                        <div class="space-y-1.5 pointer-events-none">
+                            <div class="w-9 h-9 mx-auto rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition">
+                                <i class="fas fa-images text-sm"></i>
+                            </div>
+                            <p class="text-xs font-bold text-gray-700">Klik untuk memilih foto atau seret ke sini</p>
+                            <p class="text-[11px] text-gray-400">Pilih satu atau banyak foto sekaligus (Maks. 10MB per foto)</p>
+                        </div>
+                    </div>
+
+                    <!-- Pending / New Selected Images Preview Queue -->
+                    <div id="pendingGallerySection" class="hidden space-y-2 pt-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-xs font-bold text-emerald-700 flex items-center">
+                                <i class="fas fa-cloud-upload-alt mr-1.5"></i> Foto yang Dipilih (<span id="pendingCount">0</span>)
+                            </span>
+                            <button type="button" onclick="clearAllPendingFiles()" class="text-[11px] text-rose-600 hover:underline cursor-pointer">
+                                Batalkan Semua
+                            </button>
+                        </div>
+                        <div id="pendingGalleryGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+                    </div>
                 </div>
             </div>
 
@@ -218,4 +251,116 @@
 
     </div>
 </form>
+
+@push('scripts')
+<script>
+// Cover Photo Live Preview
+document.getElementById('image')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        if (file.size > 10 * 1024 * 1024) {
+            alert('Ukuran foto sampul melebihi 10MB. Silakan pilih foto lain.');
+            e.target.value = '';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            const container = document.getElementById('coverPreviewContainer');
+            const preview = document.getElementById('coverPreview');
+            if (preview && container) {
+                preview.src = evt.target.result;
+                container.classList.remove('hidden');
+            }
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Multi-file Gallery Uploader with Queue & Previews
+const galleryInput = document.getElementById('galleryInput');
+const pendingSection = document.getElementById('pendingGallerySection');
+const pendingGrid = document.getElementById('pendingGalleryGrid');
+const pendingCount = document.getElementById('pendingCount');
+
+let pendingDataTransfer = new DataTransfer();
+
+if (galleryInput) {
+    galleryInput.addEventListener('change', function(e) {
+        const files = Array.from(e.target.files);
+        if (!files.length) return;
+
+        files.forEach(file => {
+            if (file.size > 10 * 1024 * 1024) {
+                alert(`File "${file.name}" melebihi batas 10MB dan dilewati.`);
+                return;
+            }
+            const isDuplicate = Array.from(pendingDataTransfer.files).some(
+                existing => existing.name === file.name && existing.size === file.size
+            );
+            if (!isDuplicate) {
+                pendingDataTransfer.items.add(file);
+            }
+        });
+
+        galleryInput.files = pendingDataTransfer.files;
+        renderPendingPreviews();
+    });
+}
+
+function renderPendingPreviews() {
+    if (!pendingGrid || !pendingSection) return;
+    pendingGrid.innerHTML = '';
+    const files = Array.from(pendingDataTransfer.files);
+
+    if (files.length === 0) {
+        pendingSection.classList.add('hidden');
+        if (pendingCount) pendingCount.textContent = '0';
+        return;
+    }
+
+    pendingSection.classList.remove('hidden');
+    if (pendingCount) pendingCount.textContent = files.length;
+
+    files.forEach((file, index) => {
+        const reader = new FileReader();
+        const card = document.createElement('div');
+        card.className = 'relative group rounded-xl overflow-hidden border border-emerald-200 aspect-video bg-emerald-50/30 shadow-xs flex items-center justify-center';
+
+        reader.onload = function(evt) {
+            card.innerHTML = `
+                <img src="${evt.target.result}" alt="${file.name}" class="w-full h-full object-cover">
+                <button type="button" onclick="removePendingFile(${index})" 
+                        class="absolute top-1 right-1 w-5 h-5 rounded-md bg-rose-600 hover:bg-rose-700 text-white text-[10px] flex items-center justify-center shadow cursor-pointer"
+                        title="Hapus foto ini dari antrean">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 to-transparent p-1">
+                    <p class="text-[9px] text-white truncate px-1">${file.name} (${(file.size / 1024 / 1024).toFixed(1)} MB)</p>
+                </div>
+            `;
+        };
+        reader.readAsDataURL(file);
+        pendingGrid.appendChild(card);
+    });
+}
+
+function removePendingFile(indexToRemove) {
+    const newDt = new DataTransfer();
+    Array.from(pendingDataTransfer.files).forEach((file, index) => {
+        if (index !== indexToRemove) {
+            newDt.items.add(file);
+        }
+    });
+    pendingDataTransfer = newDt;
+    if (galleryInput) galleryInput.files = pendingDataTransfer.files;
+    renderPendingPreviews();
+}
+
+function clearAllPendingFiles() {
+    pendingDataTransfer = new DataTransfer();
+    if (galleryInput) galleryInput.files = pendingDataTransfer.files;
+    renderPendingPreviews();
+}
+</script>
+@endpush
 @endsection
